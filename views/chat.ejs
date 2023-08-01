@@ -1,0 +1,195 @@
+<% layout('layout/boilerplate') %>
+
+<p><%= user.username %></p><h1 id="status"> is: Status</h1>
+
+<form action="/removeFriend?_method=DELETE" method="post" style="display: flex; justify-content: flex-end">
+  <input type="hidden" name="removeUser" value="<%= user._id %>">
+  <button type="submit">Remove Friend</button>
+</form>
+
+<form action="/deleteChat?_method=DELETE" method="post" style="display: flex; justify-content: flex-end">
+  <input type="hidden" name="id" value="<%= chat._id %>">
+  <button type="submit">Delete Chat</button>
+</form>
+
+<form action="/blockUser" method="post" style="display: flex; justify-content: flex-end">
+  <input type="hidden" name="blockFriend" value="<%= user._id %>">
+  <button type="submit">Block User</button>
+</form>
+
+
+<h2>Logged in as: <%= currentUser.username %></h2>
+
+<div id="chat-box" class="flex">
+
+        <% for(let message of messages){ %>
+          <% if(message.sender.toString() === currentUser._id.toString()) { %>
+              <span style="justify-content: flex-end;display: flex"><%= message.content %></span>
+          <% }else{ %>
+              <span style="justify-content: flex-start;display: flex"><%= message.content %></span>
+          <% } %>
+      <% } %>
+      
+</div>
+
+<% if(!isBlocked){ %>
+  <span hidden="true" id="type"><%= user.username %> is typing...</span>
+  <form id="form">
+    <input id="message-input" type="text" placeholder="Type a message..." />
+    <button type="submit">Send</button>
+  </form>
+<% }else{ %>
+  <p>You are blocked</p>
+<% } %>
+
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  
+  const socket = io();
+
+  let typingTimer;
+  const typingTimeout = 2000;
+
+  document.getElementById('message-input').addEventListener('input', () => {
+    clearTimeout(typingTimer);
+
+    const showTypingTo = '<%= user._id %>';
+
+    socket.emit('typing', showTypingTo);
+
+    typingTimer = setTimeout(() => {
+      socket.emit('stop typing', showTypingTo);
+    }, typingTimeout);
+
+  });
+  
+  console.log("in socketCon");
+
+  socket.on('connect', () => {
+
+    console.log('A client is connected!');
+
+    const data = {
+        user: '<%= currentUser._id %>'
+        //userOnChat: '<%= //user._id %>'
+    }
+
+    console.log("Going to emit!", data);
+
+    socket.emit('user', data );
+
+
+    console.log(socket.id);
+
+  });
+
+  socket.on("online", (data) => {
+
+    console.log("In Online", data);
+
+    for(let i = 0; i <= data.length; i++){
+      if('<%= user._id %>' == data[i] ){
+        const s = document.getElementById('status');
+        if(s != null){
+          s.innerHTML = "online";
+        }
+        console.log("online:" , data[i]);
+    }
+    }
+
+  });
+
+  socket.on("offline", (data) => {
+
+    console.log("In Offline", data);
+
+    //for(let i = 0; i <= data.length; i++){
+      if('<%= user._id %>' == data ){
+        const s = document.getElementById('status');
+        if(s != null){
+          s.innerHTML = "Offline";
+        }
+        console.log("offline:");
+    }
+    //}
+
+  });
+
+  socket.on('typing', () => {
+      const typeIndicator = document.getElementById('type');
+      typeIndicator.hidden = false;
+  });
+
+  socket.on('stop typing', () => {
+      const typeIndicator = document.getElementById('type');
+      typeIndicator.hidden = true;
+  });
+
+  // Handle form submission private chat
+  const form = document.getElementById('form');
+  if(form != null){
+      form.addEventListener('submit', (e) => {
+      e.preventDefault();
+      const input = document.getElementById('message-input');
+      const message = input.value.trim();
+      if (message !== '') {   
+        // Prepare the message object 
+        const messageObject = {
+          senderId: '<%= currentUser._id %>',
+          recipientId: '<%= user._id %>',
+          content: message,
+          date: new Date().toLocaleDateString(),
+          time: new Date().toLocaleTimeString('en-US', { hour12: false, 
+                                          hour: "numeric", 
+                                          minute: "numeric"})
+        };
+        console.log(messageObject, socket.id);
+        // Send the message to the server
+        socket.emit('chat message', messageObject);
+
+        // Clear the input field
+        input.value = '';
+
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.innerHTML = `
+          <span style="justify-content: flex-end;display: flex">${messageObject.content}</span>
+          `;
+        chatBox.appendChild(messageElement);
+        console.log('True');
+
+        chatBox.scrollTop = chatBox.scrollHeight;
+
+      }
+    });
+  }
+  
+  // Handle incoming messages private chat
+  const chatBox = document.getElementById('chat-box');
+  socket.on('chat message', (message) => {
+    console.log("From: ", message.senderSocketId, "My ID:", socket.id);
+
+    if(message.senderSocketId !== socket.id){
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.innerHTML = `
+          <span style="justify-content: flex-start;display: flex">${message.content}</span>
+          `;
+        chatBox.appendChild(messageElement);
+        console.log("False");
+    }
+    
+    const messageElement = document.createElement('div');
+    messageElement.classList.add('message');
+    messageElement.innerHTML = `
+        <span style="justify-content: flex-end;display: flex">${message.content}</span>
+        `;
+        console.log('True');
+
+
+    // Scroll to the bottom of the chat box
+    chatBox.scrollTop = chatBox.scrollHeight;
+  });
+
+</script>

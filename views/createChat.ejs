@@ -1,0 +1,25 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <h1>Your Friends</h1>
+
+    <% for(friend of friends){ %>
+      <ul><%= friend.friendId.username %> 
+        <form action="/createChat" method="post" id="form">
+        <input type="hidden" name="friend" value="<%= friend.friendId._id %>">
+        <button type="submit">Start Chat</button>
+        </form>
+    </ul>
+    <% } %>
+
+    
+
+</body>
+</html>
+

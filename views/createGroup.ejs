@@ -1,0 +1,83 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    <h1>Group</h1>
+    <ul id="myUL">
+        <input type="text" onkeyup="search()"  id="myInput">
+        <% for(let user of users) { %>
+            <li><p onclick="selectUser(this)"><%= user.username %></p></li>
+        <% } %>
+    </ul>
+
+    <h1>Users Selected</h1>
+
+    <form action="/createGroup" method="post" id="form">
+
+        <input type="text" name="name">
+
+        <ul id="data">
+            
+        </ul>
+
+        <button type="submit">Submit</button>
+    </form>
+
+    <script>
+
+        var users = JSON.parse(unescape('<%= escape(JSON.stringify(users)) %>'));
+        console.log(users);
+
+        const selectUser = (element) => {
+            var text = element.innerHTML;
+            const ul = document.getElementById('data');
+            const input = document.createElement('input');
+            input.type = "hidden";
+            input.name = "users[]";
+            for(let user of users){
+                if(text == user.username){
+                    text = user._id;
+                }
+            }
+            input.value = text;
+            console.log(text);
+            ul.appendChild(input);
+
+        }
+
+        const search = () => {
+            var ul = document.getElementById("myUL");
+            var li = ul.getElementsByTagName('li');
+            var input = document.getElementById('myInput');
+            var filter = input.value.toUpperCase();
+            var p;
+
+            for(let i = 0; i < li.length; i++){
+                p = li[i].getElementsByTagName('p')[0];
+                txtValue = p.textContent || p.innerText;
+                if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                    li[i].style.display = "";
+                } else {
+                    li[i].style.display = "none";
+                }
+            }
+         }
+
+         const form = document.getElementById('form');
+         form.addEventListener('submit', () => {
+            const ul = document.getElementById('data');
+            const input = document.createElement('input');
+            input.type = "hidden";
+            input.name = "users[]";
+            input.value = '<%= u %>';
+            //console.log(text);
+            ul.appendChild(input);
+         })
+    </script>
+</body>
+</html>
+

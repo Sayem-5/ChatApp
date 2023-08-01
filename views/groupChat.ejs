@@ -1,0 +1,154 @@
+<% layout('layout/boilerplate') %>
+
+<p><%= user.username %></p><h1 id="status"> is: Status</h1>
+
+<form action="/leaveGroup?_method=DELETE" method="post" style="display: flex; justify-content: flex-end">
+  <input type="hidden" name="removeUser" value="<%= currentUser._id %>">
+  <input type="hidden" name="id" value="<%= group._id %>">
+  <button type="submit">Leave Group</button>
+</form>
+
+<h2>Logged in as: <%= currentUser.username %></h2>
+
+<div id="group-chat-box" class="flex">
+
+  <% for(let message of groupMessages){ %>
+            
+    <% if(message.sender._id == u) { %>
+        <span style="justify-content: flex-end;display: flex"><span>You</span><%= message.content %></span>
+    <% }else{ %>
+        <span style="justify-content: flex-start;display: flex"><span><%= message.sender.username %> :</span> <%= message.content %></span>
+    <% } %>
+
+<% } %>
+      
+</div>
+
+<% if(isAMember){ %>
+  <form id="group-form">
+    <input id="group-message-input" type="text" placeholder="Type a message..." />
+    <button type="submit">Send</button>
+  </form>
+<% }else{ %>
+  <p>Not a Member! You can't send anything!</p>
+<% } %>
+<script src="/socket.io/socket.io.js"></script>
+
+<script>
+  
+      const socket = io();
+      const page = window.location.pathname;
+      
+      console.log("in socketCon");
+
+      socket.on('connect', () => {
+
+        console.log('A client is connected!');
+
+        const data = {
+            user: '<%= currentUser._id %>'
+            //userOnChat: '<%= //user._id %>'
+        }
+
+        console.log('currentuser: ', '<%= currentUser._id %>', '<%= currentUser.username %>');
+      
+        const groupId = '<%= group._id %>';
+
+        socket.emit('JoinRoom', groupId);
+
+        console.log("Going to emit!", data);
+
+        socket.emit('user', data );
+
+
+        console.log(socket.id);
+
+      });
+
+      // Handle form submission GROUP CHAT
+      const groupform = document.getElementById('group-form');
+      if(groupform != null){
+          groupform.addEventListener('submit', (e) => {
+          e.preventDefault();
+          const input = document.getElementById('group-message-input');
+          const message = input.value.trim();
+          if (message !== '') {   
+            // Prepare the message object 
+
+            const groupId = '<%= group._id %>';
+
+            var groupUsers = JSON.parse(unescape('<%= escape(JSON.stringify(group.users)) %>'));
+          
+            const valueToRemove = '<%= currentUser._id %>';
+          
+            const receivers = groupUsers.filter(value => value != valueToRemove);
+
+            console.log('Sending Users: ', receivers);
+
+            // const groupData = {
+            //   groupId,
+            //   receivers,
+            //   sender: '<%= currentUser._id %>'
+            // };
+
+            //console.log("Going to emit!", groupData);
+
+            const messageObject = {
+              groupId,
+              sender: '<%= currentUser._id %>',
+              receivers,
+              content: message,
+              date: new Date().toLocaleDateString(),
+              time: new Date().toLocaleTimeString('en-US', { hour12: false, 
+                                             hour: "numeric", 
+                                             minute: "numeric"})
+            };
+
+            console.log('--------- Send Group Msg Data -------- ', messageObject);
+            // Send the message to the server
+            socket.emit('group chat message', messageObject);
+
+            // Clear the input field
+            input.value = '';
+
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `
+              <span style="justify-content: flex-end;display: flex">${messageObject.content}</span>
+              `;
+            groupChatBox.appendChild(messageElement);
+            console.log('True');
+
+          }
+        });
+      }
+      
+      // Handle incoming messages GROUP CHAT
+      const groupChatBox = document.getElementById('group-chat-box');
+      socket.on('group chat message', (message) => {
+        console.log("From: ", message.senderSocketId, "My ID:", socket.id);
+
+        if(message.senderSocketId !== socket.id){
+            const messageElement = document.createElement('div');
+            messageElement.classList.add('message');
+            messageElement.innerHTML = `
+             <span style="justify-content: flex-start;display: flex">${message.senderUsername} : ${message.content}</span>
+             `;
+             groupChatBox.appendChild(messageElement);
+            console.log("False");
+        }
+        
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message');
+        messageElement.innerHTML = `
+            <span style="justify-content: flex-end;display: flex">${message.content}</span>
+            `;
+            console.log('True');
+    
+
+        // Scroll to the bottom of the chat box
+        groupChatBox.scrollTop = groupChatBox.scrollHeight;
+      });
+
+
+</script>

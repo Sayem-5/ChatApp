@@ -1,0 +1,82 @@
+<% layout('layout/boilerplate') %>
+    
+  <h1> <%= success %> </h1>
+  <h1>You are <%= msg %></h1>
+
+  <% for(user of users){ %>
+    <ul><a href="/chat/<%= user._id %>"><%= user.username %></a></ul>
+  <% } %>
+
+  <h1>Your Chats</h1>
+
+  <% for (chat of chats) { %>
+    <ul>
+      <% for (participant of chat.participants) { %>
+        <% if (participant._id.toString() !== currentUser._id.toString()) { %>
+          <a href="/chat/<%= chat._id %>"><%= participant.username %></a>
+        <% } %>
+      <% } %>
+    </ul>
+  <% } %>
+  
+  <h1>Your Friends</h1>
+
+  <% for(friend of friends){ %>
+    <ul><%= friend.friendId.username %></ul>
+  <% } %>
+
+  <a href="/search">Search</a>
+
+  <a href="/createGroup">Create a Group</a>
+
+  <a href="/groups">Groups</a>
+
+  <a href="/chats">Chats</a>
+<!--<!DOCTYPE html>
+<html>
+  <head>
+    <title>Chat Website</title>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Welcome to the Chat Website</h1>
+
+    <div id="chat-box">
+      <ul id="messages"></ul>
+    </div>
+
+    <form id="chat-form">
+      <input id="message-input" autocomplete="off" />
+      <button>Send</button>
+    </form>
+
+    <script src="/socket.io/socket.io.js"></script>
+    <script>
+      const socket = io();
+
+      // Handle form submission
+      const form = document.getElementById('chat-form');
+      form.addEventListener('submit', (e) => {
+        e.preventDefault();
+        const input = document.getElementById('message-input');
+        const message = input.value.trim();
+        if (message !== '') {
+          socket.emit('chat message', message);
+          input.value = '';
+        }
+      });
+
+      // Handle incoming messages
+      const messages = document.getElementById('messages');
+      socket.on('chat message', (msg) => {
+        const li = document.createElement('li');
+        li.textContent = msg;
+        messages.appendChild(li);
+      });
+    </script>
+  </body>
+</html>-->

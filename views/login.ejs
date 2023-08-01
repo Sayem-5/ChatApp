@@ -1,0 +1,45 @@
+<% layout('layout/boilerplate') %>
+
+<div class="bg-orange-vivid-050 flex min-h-screen justify-center items-center px-16">
+    <div class="relative w-full max-w-lg">
+        <!-- <div class="absolute top-0 -left-4 bg-magenta-400 rounded-full w-56 h-56 mix-blend-multiply filter ease-in-out blur-3xl nimate-blobOne">
+        </div>
+        <div class="absolute bottom-0 -right-4 bg-orange-vivid-400 rounded-full w-52 h-52 mix-blend-multiply filter ease-in-out blur-3xl nimate-blobTwo">
+        </div> -->
+        <div class="relative flex flex-row justify-center min-h-full items-center">
+            <div class="p-5 bg-white w-[30rem] h-[33rem] flex flex-col justify-center items-center">
+                <h1 class="text-4xl text-center font-poppins tracking-wider subpixel-antialiased font-normal text-white bg-gradient-to-tr from-magenta-500 to-orange-vivid-500 rounded-lg py-2 px-3 mt-16">ChitChat</h1>
+                <object data="/assets/loginchat.svg" type="" class="w-[30rem]"></object>
+            </div>
+            <div class="p-5 bg-white w-80 h-[33rem] flex justify-center filter backdrop-blur-xl">
+                <div class="flex flex-col space-y-5">
+                    <div class="mt-5 flex flex-row w-72 justify-center filter backdrop-blur-sm px-4 py-3 rounded-lg">
+                        <h1 class="text-3xl font-poppins subpixel-antialiased font-normal text-transparent bg-clip-text bg-gradient-to-tr from-magenta-800 to-orange-vivid-500">Welcome back...</h1>
+                    </div>
+    
+                    <div class="w-full pt-4 font-roboto">
+                        <form action="/login" method="POST" class="flex flex-col">
+                            <label for="username" class="text-sm font-medium text-gray-600 tracking-wide">Username </label>
+                            <div class="my-1">
+                                <input type="text" name="username" id="username" required placeholder="Username" class="w-full border-gray-300 focus:ring-1 focus:ring-magenta-500 focus:border-magenta-300 focus:outline-none rounded-lg shadow-sm">
+                            </div>
+                            <label for="password" class="mt-2 text-sm font-medium text-gray-600 tracking-wide">Password </label>
+                            <div class="my-1">
+                                <input type="password" name="password" id="password" required placeholder="Password" class="w-full border-gray-300 focus:ring-1 focus:ring-magenta-500 focus:border-magenta-300 focus:outline-none rounded-lg shadow-sm">
+                            </div>
+                            <div class="flex justify-center">
+                                <button type="submit" class="mt-5 w-[80%] shadow-sm bg-magenta-500 subpixel-antialiased hover:bg-magenta-400 text-white py-2 px-3 rounded-lg transition-all ease-in duration-75 hover:scale-[102%] hover:shadow-lg">Login</button>
+                            </div>
+                        </form> 
+
+                        <div class="w-full mt-10 flex justify-center text-sm font-medium text-gray-600 tracking-wide">
+                            <p>Don't have an account? <a href="/register" class="text-magenta-500 font-medium">Sign Up</a></p>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    
+</div>

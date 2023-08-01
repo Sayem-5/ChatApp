@@ -1,0 +1,9 @@
+<% layout('layout/boilerplate') %>
+
+<h1>Groups:</h1>
+
+<% for(group of groups){ %>
+  <ul><a href="/group/<%= group._id %>"><%= group.name %></a></ul>
+<% } %>
+
+<a href="/createGroup">Create A Group</a>

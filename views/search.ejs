@@ -1,0 +1,101 @@
+<% layout('layout/boilerplate') %>
+
+<h1>Search Users</h1>
+
+<input type="text" onkeyup="search()"  id="myInput">
+
+
+
+<ul id="myUL" hidden="true">
+    <% for(let user of users) { %>
+        <li><p onclick="selectUser(this)"><%= user.username %></p>
+        
+            <form action="/addFriend" method="post">
+                <input type="hidden" name="addUser" value="<%= user._id %>">
+                <button type="submit">Add Friend</button>
+            </form>
+        
+        </li>
+    <% } %>
+</ul>
+
+<h1>Friends</h1>
+
+<% for (let user of users) { %>
+    <% if (user._id.equals(currentUser._id)) { %>
+      <% for (let friend of user.friends) { %>
+        <li><%= friend.friendId.username %></li>
+      <% } %>
+    <% } %>
+  <% } %>
+
+<!-- <form action="/group" method="post" id="form">
+
+    <input type="text" name="name">
+
+    <ul id="data">
+        
+    </ul>
+
+    <button type="submit">Submit</button>
+</form> -->
+
+<script>
+
+    var users = JSON.parse(unescape('<%= escape(JSON.stringify(users)) %>'));
+    console.log(users);
+
+    const selectUser = (element) => {
+        var text = element.innerHTML;
+        const ul = document.getElementById('data');
+        const input = document.createElement('input');
+        input.type = "hidden";
+        input.name = "users[]";
+        for(let user of users){
+            if(text == user.username){
+                text = user._id;
+            }
+        }
+        input.value = text;
+        console.log(text);
+        ul.appendChild(input);
+
+    }
+
+    const search = () => {
+        var ul = document.getElementById("myUL");
+        var li = ul.getElementsByTagName('li');
+        var input = document.getElementById('myInput');
+        var filter = input.value.toUpperCase();
+        var p;
+
+        ul.hidden = false;
+
+        for(let i = 0; i < li.length; i++){
+            p = li[i].getElementsByTagName('p')[0];
+            txtValue = p.textContent || p.innerText;
+            if (txtValue.toUpperCase().indexOf(filter) > -1) {
+                li[i].style.display = "";
+            } else {
+                li[i].style.display = "none";
+            }
+
+        }
+
+        if(input.value === ""){
+            ul.hidden = true;
+        }
+
+     }
+
+    //  const form = document.getElementById('form');
+    //  form.addEventListener('submit', () => {
+    //     const ul = document.getElementById('data');
+    //     const input = document.createElement('input');
+    //     input.type = "hidden";
+    //     input.name = "users[]";
+    //     input.value = '<%= //u %>';
+    //     //console.log(text);
+    //     ul.appendChild(input);
+    //  })
+</script>
